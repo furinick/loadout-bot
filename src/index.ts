@@ -3,7 +3,12 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+  ],
+});
 
 client.once('clientReady', () => {
   console.log(`Logged in as ${client.user?.tag}`);
