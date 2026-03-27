@@ -18,7 +18,8 @@ export interface DB {
   config: {
     submissionChannel?: string;
     reviewChannel?: string;
+    loadoutChannel?: string;
     adminRole?: string;
   };
-  players: Record<string, Player>; // keyed by discordUID
+  players: Record<string, Player>;
 }
