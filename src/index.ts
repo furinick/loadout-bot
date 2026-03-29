@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import * as submit from './commands/submit.js';
 import * as setup from './commands/setup.js';
 import * as remove from './commands/remove.js';
+import * as generate from './commands/generate.js'
 
 dotenv.config();
 
@@ -17,7 +18,8 @@ const client = new Client({
 const commands = new Collection([
   [submit.data.name, submit],
   [setup.data.name, setup],
-  [remove.data.name, remove]
+  [remove.data.name, remove],
+  [generate.data.name, generate]
 ]);
 
 client.once('clientReady', () => {
