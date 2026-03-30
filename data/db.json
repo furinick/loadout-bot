@@ -5,14 +5,14 @@
   "players": {
     "1349144037130506240": {
       "discordUID": "1349144037130506240",
-      "name": "barack hussein obama",
-      "role": "drone operator",
+      "name": "claudio",
+      "role": "medic",
       "squad": "aglet",
-      "loadout": "[[[\"arifle_MX_ACO_pointer_F\",\"\",\"acc_pointer_IR\",\"optic_Aco\",[\"30Rnd_65x39_caseless_mag\",30],[],\"\"],[],[\"hgun_P07_F\",\"\",\"\",\"\",[\"16Rnd_9x21_Mag\",17],[],\"\"],[\"U_B_CombatUniform_mcam\",[[\"FirstAidKit\",1],[\"30Rnd_65x39_caseless_mag\",2,30],[\"HandGrenade\",1,1]]],[\"V_PlateCarrierSpec_rgr\",[[\"30Rnd_65x39_caseless_mag\",7,30],[\"16Rnd_9x21_Mag\",2,17],[\"SmokeShell\",1,1],[\"SmokeShellGreen\",1,1],[\"Chemlight_green\",2,1]]],[\"B_UAV_01_backpack_F\",[]],\"H_HelmetB\",\"G_Tactical_Clear\",[],[\"ItemMap\",\"B_UavTerminal\",\"ItemRadio\",\"ItemCompass\",\"ItemWatch\",\"NVGoggles\"]],[]]",
+      "loadout": "[[[\"hlc_lmg_M60E4\",\"\",\"\",\"CUP_optic_ACOG2\",[\"CUP_100Rnd_TE4_LRT4_White_Tracer_762x51_Belt_M\",100],[],\"\"],[\"rhs_weap_M136\",\"\",\"\",\"\",[],[],\"\"],[\"CUP_hgun_Colt1911\",\"\",\"\",\"\",[\"CUP_7Rnd_45ACP_1911\",7],[],\"\"],[\"rhsgref_uniform_og107\",[[\"ACE_splint\",2],[\"ACE_tourniquet\",1],[\"kat_TXA\",1],[\"kat_larynx\",1],[\"kat_EACA\",3],[\"kat_chestSeal\",2],[\"ACE_bloodIV\",2],[\"ACE_elasticBandage\",6],[\"ACE_fieldDressing\",6],[\"UK3CB_BAF_SmokeShell\",1,1]]],[\"CUP_V_CPC_weapons_rngr\",[[\"kat_TXA\",2],[\"kat_larynx\",1],[\"hlc_100Rnd_762x51_M_M60E4\",1,100],[\"CUP_7Rnd_45ACP_1911\",1,7]]],[\"pmc_MysteryCL_mc\",[[\"cigs_lucky_strike_cigpack\",1,20],[\"UK3CB_BAF_SmokeShell\",6,1],[\"hlc_100Rnd_762x51_M_M60E4\",1,100],[\"hlc_200Rnd_762x51_Mdim_M60E4\",2,200]]],\"CUP_H_USArmy_Helmet_M1_btp\",\"\",[\"Binocular\",\"\",\"\",\"\",[],[],\"\"],[\"ItemMap\",\"\",\"TFAR_anprc152\",\"ItemCompass\",\"ItemWatch\",\"\"]],[[\"ace_arsenal_insignia\",\"CUP_insignia_ua_kraken\"],[\"ace_earplugs\",true]]]",
       "status": "approved",
-      "submittedAt": 1774820324515,
+      "submittedAt": 1774822950310,
       "reviewedBy": "furinick_",
-      "reviewedAt": 1774820328510
+      "reviewedAt": 1774822964674
     }
   }
 }
