@@ -1,18 +1,27 @@
 {
   "config": {
-    "adminRole": "1486897318669320273"
+    "adminRole": "1486897318669320273",
+    "submissionChannel": "1485788712410419230",
+    "loadoutChannel": "1491985258394947634"
   },
   "players": {
+    "275216379450490883": {
+      "discordUID": "275216379450490883",
+      "name": "Bobby Drop tables",
+      "role": "rifleman",
+      "squad": "platoon",
+      "loadout": "Fuck you",
+      "status": "pending",
+      "submittedAt": 1774887447409
+    },
     "1349144037130506240": {
       "discordUID": "1349144037130506240",
-      "name": "claudio",
-      "role": "medic",
+      "name": "g",
+      "role": "rifleman",
       "squad": "aglet",
       "loadout": "[[[\"hlc_lmg_M60E4\",\"\",\"\",\"CUP_optic_ACOG2\",[\"CUP_100Rnd_TE4_LRT4_White_Tracer_762x51_Belt_M\",100],[],\"\"],[\"rhs_weap_M136\",\"\",\"\",\"\",[],[],\"\"],[\"CUP_hgun_Colt1911\",\"\",\"\",\"\",[\"CUP_7Rnd_45ACP_1911\",7],[],\"\"],[\"rhsgref_uniform_og107\",[[\"ACE_splint\",2],[\"ACE_tourniquet\",1],[\"kat_TXA\",1],[\"kat_larynx\",1],[\"kat_EACA\",3],[\"kat_chestSeal\",2],[\"ACE_bloodIV\",2],[\"ACE_elasticBandage\",6],[\"ACE_fieldDressing\",6],[\"UK3CB_BAF_SmokeShell\",1,1]]],[\"CUP_V_CPC_weapons_rngr\",[[\"kat_TXA\",2],[\"kat_larynx\",1],[\"hlc_100Rnd_762x51_M_M60E4\",1,100],[\"CUP_7Rnd_45ACP_1911\",1,7]]],[\"pmc_MysteryCL_mc\",[[\"cigs_lucky_strike_cigpack\",1,20],[\"UK3CB_BAF_SmokeShell\",6,1],[\"hlc_100Rnd_762x51_M_M60E4\",1,100],[\"hlc_200Rnd_762x51_Mdim_M60E4\",2,200]]],\"CUP_H_USArmy_Helmet_M1_btp\",\"\",[\"Binocular\",\"\",\"\",\"\",[],[],\"\"],[\"ItemMap\",\"\",\"TFAR_anprc152\",\"ItemCompass\",\"ItemWatch\",\"\"]],[[\"ace_arsenal_insignia\",\"CUP_insignia_ua_kraken\"],[\"ace_earplugs\",true]]]",
-      "status": "approved",
-      "submittedAt": 1774822950310,
-      "reviewedBy": "furinick_",
-      "reviewedAt": 1774822964674
+      "status": "pending",
+      "submittedAt": 1775787808449
     }
   }
 }

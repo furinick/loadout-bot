@@ -4,6 +4,8 @@ import * as submit from './commands/submit.js';
 import * as setup from './commands/setup.js';
 import * as remove from './commands/remove.js';
 import * as generate from './commands/generate.js';
+import * as weight from './commands/weight.js';
+
 
 dotenv.config();
 
@@ -11,7 +13,8 @@ const commands = [
   submit.data.toJSON(),
   setup.data.toJSON(),
   remove.data.toJSON(),
-  generate.data.toJSON()
+  generate.data.toJSON(),
+  weight.data.toJSON()
 ];
 
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN!);

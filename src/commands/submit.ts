@@ -9,6 +9,7 @@ import {
 } from 'discord.js';
 import { loadDB, saveDB } from '../db.js';
 import type { Player, Role, Squad } from '../types.js';
+import { calculateWeight } from '../weight.js';
 
 export const data = new SlashCommandBuilder()
   .setName('submit')
@@ -19,8 +20,8 @@ export const data = new SlashCommandBuilder()
     opt.setName('role').setDescription('Your role').setRequired(true)
       .addChoices(
         { name: 'Rifleman', value: 'rifleman' },
-        { name: 'LAT', value: 'LAT' },
-        { name: 'HAT', value: 'HAT' },
+        { name: 'Light AT', value: 'LAT' },
+        { name: 'Heavy AT', value: 'HAT' },
         { name: 'Team Leader', value: 'TL' },
         { name: 'Squad Leader', value: 'SL' },
         { name: 'Grenadier', value: 'grenadier' },
@@ -34,7 +35,7 @@ export const data = new SlashCommandBuilder()
     opt.setName('squad').setDescription('Your squad').setRequired(true)
       .addChoices(
         { name: 'Aglet', value: 'aglet' },
-        { name: 'Buste', value: 'buster' },
+        { name: 'Buster', value: 'buster' },
         { name: 'Platoon', value: 'platoon' },
       ))
   .addStringOption(opt =>
@@ -69,6 +70,9 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     submittedAt: Date.now(),
   };
 
+  const weight = calculateWeight(player.loadout);
+
+
   db.players[interaction.user.id] = player;
   saveDB(db);
 
@@ -83,6 +87,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       .addFields(
         { name: 'Squad', value: player.squad, inline: true },
         { name: 'Role', value: player.role, inline: true },
+        { name: 'Weight', value: weight !== null ? `${weight} kg` : 'N/A', inline: true },
         { name: 'Export Code', value: '```\n' + player.loadout.slice(0, 1000) + '\n```' },
       )
       .setFooter({ text: `Submitted by ${interaction.user.username} • Pending approval` })
