@@ -55,7 +55,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
     return interaction.reply({
       content: `**Weight breakdown for ${player.name}**\n\n**Total: ${total}kg**\n\n**Found (${found.length}):**\n${foundText}\n\n**Missing from DB (${missing.length}):**\n${missingText}`,
-      ephemeral: false,
+      ephemeral: true,
     });
   } catch {
     return interaction.reply({ content: '❌ Failed to parse loadout.', ephemeral: true });
