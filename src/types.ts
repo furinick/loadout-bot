@@ -16,8 +16,6 @@ export interface Player {
 
 export interface DB {
   config: {
-    submissionChannel?: string;
-    reviewChannel?: string;
     loadoutChannel?: string;
     adminRole?: string;
   };
