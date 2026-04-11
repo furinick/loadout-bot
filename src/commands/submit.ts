@@ -45,9 +45,9 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   const db = loadDB();
 
   // Check correct channel
-  if (db.config.submissionChannel && interaction.channelId !== db.config.submissionChannel) {
+  if (db.config.loadoutChannel && interaction.channelId !== db.config.loadoutChannel) {
     return interaction.reply({
-      content: `Please submit in <#${db.config.submissionChannel}>.`,
+      content: `Please submit in <#${db.config.loadoutChannel}>.`,
       ephemeral: true,
     });
   }
