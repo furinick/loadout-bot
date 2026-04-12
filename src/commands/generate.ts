@@ -33,11 +33,36 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   }
 
   const script = generateSQF(approved);
-  const file = new AttachmentBuilder(Buffer.from(script, 'utf8'), { name: 'phoenix_setup.sqf' });
+
+  const count = approved.length;
+  const plural = count !== 1 ? 's' : '';
+
+  const content = `
+📦 Setup script generated for **${count} operator${plural}**.
+
+Paste the following into the 3DEN debug console (Ctrl + D) and then execute:
+
+\`\`\`sqf
+${script}
+\`\`\`
+`;
+
+  // Discord hard limit ≈ 2000 chars
+  if (content.length > 2000) {
+    const file = new AttachmentBuilder(Buffer.from(script, 'utf8'), {
+      name: 'phoenix_setup.sqf',
+    });
+
+    return interaction.reply({
+      content: `📦 Script too large for Discord message. Uploaded as file instead.`,
+      files: [file],
+      ephemeral: true,
+    });
+  }
 
   return interaction.reply({
-    content: `📦 Setup script generated for **${approved.length} operator${approved.length !== 1 ? 's' : ''}**.\nPaste \`phoenix_setup.sqf\` into the 3DEN debug console.`,
-    files: [file],
+    content,
     ephemeral: true,
   });
 }
+
