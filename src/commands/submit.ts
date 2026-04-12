@@ -15,7 +15,7 @@ export const data = new SlashCommandBuilder()
   .setName('submit')
   .setDescription('Submit your loadout for approval')
   .addStringOption(opt =>
-    opt.setName('name').setDescription('Your character name').setRequired(true))
+    opt.setName('name').setDescription('Your in-game name').setRequired(true))
   .addStringOption(opt =>
     opt.setName('role').setDescription('Your role').setRequired(true)
       .addChoices(
@@ -103,7 +103,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       .setCustomId(`reject__${interaction.user.id}`)
       .setLabel('Reject')
       .setStyle(ButtonStyle.Danger)
-      .setEmoji('❌');
+      .setEmoji('🚮');
 
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(approveBtn, rejectBtn);
 

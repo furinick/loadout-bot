@@ -34,7 +34,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   saveDB(db);
 
   return interaction.reply({
-    content: `✅ Submission for **${target.username}** removed.`,
+    content: `Submission for **${target.username}** removed.`,
     ephemeral: true,
   });
 }
