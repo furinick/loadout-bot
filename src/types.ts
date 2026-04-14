@@ -1,3 +1,5 @@
+import type { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+
 export type Role = 'rifleman' | 'LAT' | 'HAT' | 'TL' | 'SL' | 'grenadier' | 'medic' | 'engineer' | 'drone operator' | 'machinegunner' | 'autorifleman';
 export type Squad = 'aglet' | 'buster' | 'platoon';
 export type Status = 'pending' | 'approved' | 'rejected';
@@ -20,4 +22,9 @@ export interface DB {
     adminRole?: string;
   };
   players: Record<string, Player>;
+}
+
+export interface Command {
+  data: SlashCommandBuilder;
+  execute: (interaction: ChatInputCommandInteraction) => Promise<unknown>;
 }
