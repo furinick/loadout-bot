@@ -63,18 +63,33 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     });
   }
 
+  const loadoutString = interaction.options.getString('loadout', true);
+
+  // Validate the loadout BEFORE creating the player object
+  const validationResult = validateLoadoutString(loadoutString);
+  if (!validationResult.valid) {
+    const errors = validationResult.errors
+      .slice(0, 5)
+      .map(e => `- ${e.message}`)
+      .join('\n')
+
+    return interaction.reply({
+      content: `❌ Invalid loadout:\n${errors}`,
+      ephemeral: true,
+    })
+  }
+
   const player: Player = {
     discordUID: interaction.user.id,
     name: interaction.options.getString('name', true),
     role: interaction.options.getString('role', true) as Role,
     squad: interaction.options.getString('squad', true) as Squad,
-    loadout: interaction.options.getString('loadout', true),
+    loadout: loadoutString,
     status: 'pending',
     submittedAt: Date.now(),
   };
 
   const weight = calculateWeight(player.loadout);
-
 
   db.players[interaction.user.id] = player;
   saveDB(db);
@@ -84,20 +99,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   const loadoutChannel = await interaction.client.channels.fetch(loadoutChannelId);
 
   if (loadoutChannel?.isTextBased() && !loadoutChannel.isDMBased()) {
-    // Validating the loadout before adding
-    const result = validateLoadoutString(player.loadout);
-    if (!result.valid) {
-      const errors = result.errors
-        .slice(0, 5)
-        .map(e => `- ${e.message}`)
-        .join('\n')
-
-      return interaction.reply({
-        content: `❌ Invalid loadout:\n${errors}`,
-        ephemeral: true,
-      })
-    }
-
     const embed = new EmbedBuilder()
       .setTitle(`${player.name}`)
       .setColor(0xE67E22)
