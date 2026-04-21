@@ -10,6 +10,7 @@ import {
 import { loadDB, saveDB } from '../db.js';
 import type { Player, Role, Squad } from '../types.js';
 import { calculateWeight } from '../weight.js';
+import { validateLoadoutString } from '../validation/loadout.js';
 
 export const data = new SlashCommandBuilder()
   .setName('submit')
@@ -81,6 +82,20 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   const loadoutChannel = await interaction.client.channels.fetch(loadoutChannelId);
 
   if (loadoutChannel?.isTextBased() && !loadoutChannel.isDMBased()) {
+    // Validating the loadout before adding
+    const result = validateLoadoutString(player.loadout);
+    if (!result.valid) {
+      const errors = result.errors
+        .slice(0, 5)
+        .map(e => `- ${e.message}`)
+        .join('\n')
+
+      return interaction.reply({
+        content: `❌ Invalid loadout:\n${errors}`,
+        ephemeral: true,
+      })
+    }
+
     const embed = new EmbedBuilder()
       .setTitle(`${player.name}`)
       .setColor(0xE67E22)
