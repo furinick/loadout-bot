@@ -12,6 +12,7 @@ import type { Player, Role, Squad } from '../types.js';
 import { calculateWeight } from '../weight.js';
 import { validateLoadoutString } from '../validation/loadout.js';
 
+
 export const data = new SlashCommandBuilder()
   .setName('submit')
   .setDescription('Submit your loadout for approval')
@@ -41,6 +42,7 @@ export const data = new SlashCommandBuilder()
       ))
   .addStringOption(opt =>
     opt.setName('loadout').setDescription('Paste your ACE Arsenal SQF export here').setRequired(true));
+
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   const db = loadDB();
