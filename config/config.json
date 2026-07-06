@@ -7,14 +7,71 @@
     "SL",
     "grenadier",
     "medic",
+    "CLS",
     "engineer",
     "drone operator",
     "machinegunner",
-    "autorifleman"
+    "autorifleman",
+    "marksman",
+    "vic driver",
+    "vic gunner",
+    "vic commander",
+    "platoon commander"
   ],
   "squads": [
-    "aglet",
+    "raven",
     "buster",
-    "platoon"
-  ]
+    "steel rider"
+  ],
+  "orbat": {
+    "raven": {
+      "sl": "platoon commander",
+      "attachments": [
+        "drone operator",
+        "medic"
+      ],
+      "fireteams": []
+    },
+    "buster": {
+      "sl": "SL",
+      "attachments": [
+        "HAT",
+        "CLS",
+        "engineer",
+        "machinegunner"
+      ],
+      "fireteams": [
+        {
+          "tl": "TL",
+          "members": [
+            "grenadier",
+            "CLS",
+            "LAT",
+            "machinegunner",
+            "marksman",
+            "rifleman"
+          ]
+        },
+        {
+          "tl": "TL",
+          "members": [
+            "rifleman",
+            "rifleman"
+          ]
+        }
+      ]
+    },
+    "steel rider": {
+      "sl": "vic commander",
+      "attachments": [],
+      "fireteams": [
+        {
+          "tl": "vic driver",
+          "members": [
+            "vic gunner"
+          ]
+        }
+      ]
+    }
+  }
 }

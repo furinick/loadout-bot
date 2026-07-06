@@ -9,7 +9,7 @@
  */
 import fs from 'fs';
 import path from 'path';
-import type { DB } from './types.js';
+import type { DB, ORBAT } from './types.js';
 
 /**
  * Path to the database file.
@@ -91,7 +91,8 @@ const DEFAULT_CONFIG = {
     "grenadier", "medic", "engineer",
     "drone operator", "machinegunner", "autorifleman"
   ],
-  squads: ["aglet", "buster", "platoon"]
+  squads: ["aglet", "buster", "platoon"],
+  orbat: {} as ORBAT
 };
 
 export type BotConfig = typeof DEFAULT_CONFIG;

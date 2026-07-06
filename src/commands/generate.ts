@@ -3,6 +3,8 @@
  *
  * Generates an Arma 3 SQF script that spawns all approved players as units
  * in the 3DEN editor, with their submitted loadouts pre-applied.
+ * Units are arranged in formation based on the ORBAT config.
+ * Unfilled slots are spawned as vacant placeholder units.
  *
  * Command: `/generate`
  *
@@ -17,41 +19,45 @@
  */
 
 import { SlashCommandBuilder, ChatInputCommandInteraction, AttachmentBuilder, PermissionFlagsBits } from 'discord.js';
-import { loadDB } from '../db.js';
-import type { Player } from '../types.js';
+import { loadDB, config } from '../db.js';
+import type { ResolvedUnit } from '../types.js';
+import { resolveORBAT } from '../orbat.js';
+import { calculateFormation } from '../formation.js';
 
 /**
- * Generates an Arma 3 SQF script that creates editor units for each approved player.
+ * Default empty loadout for vacant placeholder units.
+ * Spawns a bare unit with no equipment.
+ */
+const VACANT_LOADOUT = `[[],[],[],["U_BasicBody",[]],["V_PlateCarrier1_rgr",[]],[],"",[],[],[""]]`;
+
+/**
+ * Generates an Arma 3 SQF script from a formation position map.
  *
- * For each player the script:
- * 1. Stores their loadout in a private variable
- * 2. Creates a base soldier unit (`B_Soldier_F`) in the 3DEN editor,
- *    offset along the X axis by 2 units per player to avoid overlap
- * 3. Sets the unit's display name to the player's in-game name
- * 4. Applies their submitted loadout via `setUnitLoadout`
+ * For each unit the script:
+ * 1. Stores their loadout in a private variable (or uses the vacant default)
+ * 2. Creates a base soldier unit in the 3DEN editor at the calculated position
+ * 3. Sets the unit's display name
+ * 4. Applies their loadout via `setUnitLoadout`
  *
  * Units are positioned relative to the center of the current screen view
  * (`screenToWorld [0.5, 0.5]`), so run the script with the 3DEN viewport
  * focused on where you want them placed.
  *
- * Note: `date` is computed but currently unused — reserved for future use
- * (e.g. embedding a generation timestamp in the script header).
- *
- * @param players - Array of approved players to generate units for
+ * @param positions - Map of resolved units to their [x, y] positions
  * @returns SQF script string ready to paste into the 3DEN debug console
  */
-function generateSQF(players: Player[]): string {
-  const date = new Date().toISOString().replace('T', ' ').slice(0, 19);
+function generateSQF(positions: Map<ResolvedUnit, [number, number]>): string {
+  let out = `private _center = screenToWorld [0.5, 0.5];\n`;
 
-  let out = `private _center = screenToWorld [0.5, 0.5];`;
-
-  players.forEach((player, i) => {
-    const offset = i * 2;
-    out += `private _loadout${i} = ${player.loadout};\n`;
-    out += `private _unit${i} = create3DENEntity ["Object", "B_Soldier_F", [(_center select 0) + ${offset}, _center select 1, _center select 2]];\n`;
-    out += `_unit${i} set3DENAttribute ["name", "${player.name}"];\n`;
+  let i = 0;
+  for (const [unit, [x, y]] of positions) {
+    const loadout = unit.loadout ?? VACANT_LOADOUT;
+    out += `private _loadout${i} = ${loadout};\n`;
+    out += `private _unit${i} = create3DENEntity ["Object", "B_Soldier_F", [(_center select 0) + ${x}, (_center select 1) + ${y}, _center select 2]];\n`;
+    out += `_unit${i} set3DENAttribute ["name", "${unit.name}"];\n`;
     out += `_unit${i} setUnitLoadout (_loadout${i} select 0);\n\n`;
-  });
+    i++;
+  }
 
   return out;
 }
@@ -70,35 +76,43 @@ export const data = new SlashCommandBuilder()
 /**
  * Executes the generate command.
  *
- * Loads all approved player submissions, generates the SQF script, then replies
+ * Loads all approved player submissions, resolves them against the ORBAT,
+ * calculates formation positions, generates the SQF script, then replies
  * either with the script inline or as a file attachment if it exceeds Discord's
  * 2000 character message limit.
  *
  * Flow:
  * 1. Load approved players from the database
- * 2. Bail early if no approved submissions exist
- * 3. Generate the SQF script
- * 4. If the formatted message fits in 2000 chars, send it inline
- * 5. Otherwise upload the raw script as `phoenix_setup.sqf`
- *
- * Note: The 2000 char check is against the full formatted `content` string
- * (including the instruction text and code block), not just the raw script.
- * The file attachment contains only the raw SQF.
+ * 2. Bail early if no approved submissions and no ORBAT defined
+ * 3. Resolve players against ORBAT (fills vacant slots)
+ * 4. Calculate formation positions
+ * 5. Generate SQF script
+ * 6. If the formatted message fits in 2000 chars, send it inline
+ * 7. Otherwise upload the raw script as `phoenix_setup.sqf`
  *
  * @param interaction - The Discord interaction from the `/generate` command
  */
 export async function execute(interaction: ChatInputCommandInteraction) {
   const db = loadDB();
-
   const approved = Object.values(db.players).filter(p => p.status === 'approved');
 
-  if (approved.length === 0) {
-    return interaction.reply({ content: '⚠️ No approved loadouts yet.', ephemeral: true });
+  if (approved.length === 0 && Object.keys(config.orbat).length === 0) {
+    return interaction.reply({ content: '⚠️ No approved loadouts and no ORBAT defined.', ephemeral: true });
   }
 
-  const script = generateSQF(approved);
+  // Resolve players against ORBAT
+  const resolvedSquads = resolveORBAT(config.orbat, approved);
 
-  const count = approved.length;
+  // Calculate formation positions
+  const positions = calculateFormation(resolvedSquads);
+
+  if (positions.size === 0) {
+    return interaction.reply({ content: '⚠️ No units to generate.', ephemeral: true });
+  }
+
+  const script = generateSQF(positions);
+
+  const count = positions.size;
   const plural = count !== 1 ? 's' : '';
 
   const content = `

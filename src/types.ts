@@ -67,3 +67,58 @@ export interface Command {
   data: SlashCommandBuilder;
   execute: (interaction: ChatInputCommandInteraction) => Promise<unknown>;
 }
+
+// ======================================
+// Types regarding ORBAT
+// ======================================
+
+/**
+ * A single fireteam within a squad
+ */
+export interface Fireteam {
+  tl: string;
+  members: string[];
+}
+
+/**
+ * A squad's ORBAT definition
+ */
+export interface SquadORBAT {
+  sl: string;
+  attachments: string[];
+  fireteams: Fireteam[];
+}
+
+/**
+ * Full ORBAT definition, keyed by squad name
+ */
+export type ORBAT = Record<string, SquadORBAT>;
+
+/**
+ * A resolved unit slot, either filled by a player or vacant
+ */
+export interface ResolvedUnit {
+  name: string;
+  loadout: string | null; // null = vacant, use default
+  role: string;
+  vacant: boolean;
+}
+
+/**
+ * A resolved fireteam after matching
+ */
+export interface ResolvedFireteam {
+  tl: ResolvedUnit;
+  members: ResolvedUnit[];
+}
+
+/**
+ * A fully resolved squad after matching players to ORBAT
+ */
+export interface ResolvedSquad {
+  name: string;
+  sl: ResolvedUnit;
+  attachments: ResolvedUnit[];
+  fireteams: ResolvedFireteam[];
+  extras: ResolvedUnit[]; // players that didn't fit any slot
+}
