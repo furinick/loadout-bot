@@ -3,10 +3,10 @@
  * 
  * Provides functions to load and save the application database from/to disk.
  * The database is stored as JSON in `data/db.json`.
+ * Bot configuration is loaded once at startup from `config/config.json`.
  * 
  * @module db
  */
-
 import fs from 'fs';
 import path from 'path';
 import type { DB } from './types.js';
@@ -44,7 +44,6 @@ export function loadDB(): DB {
   if (!fs.existsSync('data')) {
     fs.mkdirSync('data');
   }
-
   // Initialize database file if it doesn't exist
   if (!fs.existsSync(DB_PATH)) {
     fs.writeFileSync(
@@ -52,7 +51,6 @@ export function loadDB(): DB {
       JSON.stringify({ config: {}, players: {} }, null, 2)
     );
   }
-
   // Read and parse the database file
   return JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
 }
@@ -73,3 +71,42 @@ export function loadDB(): DB {
 export function saveDB(db: DB): void {
   fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
 }
+
+/**
+ * Path to the bot configuration file.
+ * 
+ * Located at: `{project_root}/config/config.json`
+ * 
+ * @constant
+ */
+const CONFIG_PATH = path.join(process.cwd(), 'config', 'config.json');
+
+/**
+ * Default configuration values.
+ * Used as fallback if no config.json exists.
+ */
+const DEFAULT_CONFIG = {
+  roles: [
+    "rifleman", "LAT", "HAT", "TL", "SL",
+    "grenadier", "medic", "engineer",
+    "drone operator", "machinegunner", "autorifleman"
+  ],
+  squads: ["aglet", "buster", "platoon"]
+};
+
+export type BotConfig = typeof DEFAULT_CONFIG;
+
+/**
+ * Bot configuration, loaded once at startup.
+ * 
+ * If no config.json exists, defaults are written to disk and used.
+ * To apply config changes, edit config/config.json and redeploy.
+ */
+export const config: BotConfig = (() => {
+  if (!fs.existsSync(CONFIG_PATH)) {
+    console.warn('⚠️  No config.json found, writing defaults. Redeploy after editing config/config.json.');
+    fs.writeFileSync(CONFIG_PATH, JSON.stringify(DEFAULT_CONFIG, null, 2));
+    return DEFAULT_CONFIG;
+  }
+  return JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
+})();

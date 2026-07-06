@@ -69,6 +69,10 @@ to your clipboard, yes it takes a while and will look like your ARMA3 froze.
 If you are on linux ask a friend to run it and send the contents to you. The
 generated output goes into `data/db.json`
 
+## Edit Squads and Roles
+
+Inside `config/config.json` you can change what squads and roles are available
+
 ## Commands
 
 - `/setup adminrole {role}` - Sets what role will be able to approve loadouts.

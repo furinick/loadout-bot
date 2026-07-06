@@ -13,13 +13,14 @@
 import {
   SlashCommandBuilder,
   ChatInputCommandInteraction,
+  AutocompleteInteraction,
   EmbedBuilder,
   ButtonBuilder,
   ButtonStyle,
   ActionRowBuilder,
 } from 'discord.js';
-import { loadDB, saveDB } from '../db.js';
-import type { Player, Role, Squad } from '../types.js';
+import { loadDB, saveDB, config } from '../db.js';
+import type { Player } from '../types.js';
 import { calculateWeight } from '../weight.js';
 import { validateLoadoutString } from '../validation/loadout.js';
 
@@ -28,8 +29,8 @@ import { validateLoadoutString } from '../validation/loadout.js';
  * 
  * Defines the command name, description, and required options:
  * - `name`: In-game player name
- * - `role`: Character role (rifleman, medic, squad leader, etc.)
- * - `squad`: Squad assignment (aglet, buster, or platoon)
+ * - `role`: Character role — autocompleted at startup from config
+ * - `squad`: Squad assignment — autocompleted at startup from config
  * - `loadout`: Raw ACE Arsenal SQF export string
  */
 export const data = new SlashCommandBuilder()
@@ -46,30 +47,14 @@ export const data = new SlashCommandBuilder()
       .setName('role')
       .setDescription('Your role')
       .setRequired(true)
-      .addChoices(
-        { name: 'Rifleman', value: 'rifleman' },
-        { name: 'Light AT', value: 'LAT' },
-        { name: 'Heavy AT', value: 'HAT' },
-        { name: 'Team Leader', value: 'TL' },
-        { name: 'Squad Leader', value: 'SL' },
-        { name: 'Grenadier', value: 'grenadier' },
-        { name: 'Medic', value: 'medic' },
-        { name: 'Engineer', value: 'engineer' },
-        { name: 'Drone Operator', value: 'drone operator' },
-        { name: 'Machinegunner', value: 'machinegunner' },
-        { name: 'Autorifleman', value: 'autorifleman' }
-      )
+      .addChoices(...config.roles.map(r => ({ name: r, value: r })))
   )
   .addStringOption(opt =>
     opt
       .setName('squad')
       .setDescription('Your squad')
       .setRequired(true)
-      .addChoices(
-        { name: 'Aglet', value: 'aglet' },
-        { name: 'Buster', value: 'buster' },
-        { name: 'Platoon', value: 'platoon' }
-      )
+      .addChoices(...config.squads.map(s => ({ name: s, value: s })))
   )
   .addStringOption(opt =>
     opt
@@ -79,23 +64,41 @@ export const data = new SlashCommandBuilder()
   );
 
 /**
+ * Handles autocomplete interactions for the submit command.
+ * 
+ * Responds with filtered role or squad options from the config,
+ * matching what the user has typed so far.
+ * 
+ * @param interaction - The Discord autocomplete interaction
+ */
+export async function autocomplete(interaction: AutocompleteInteraction) {
+  const focused = interaction.options.getFocused(true);
+
+  let choices: string[] = [];
+  if (focused.name === 'role') choices = config.roles;
+  if (focused.name === 'squad') choices = config.squads;
+
+  const filtered = choices
+    .filter(c => c.toLowerCase().startsWith(focused.value.toLowerCase()))
+    .map(c => ({ name: c, value: c }));
+
+  await interaction.respond(filtered);
+}
+
+/**
  * Executes the submit command.
  * 
  * Flow:
  * 1. Validate that submission is in the correct channel (if configured)
  * 2. Check for duplicate submissions from the same user
- * 3. Validate the ACE Arsenal loadout format
- * 4. Create player record in database with pending status
- * 5. Calculate loadout weight
- * 6. Post review embed to loadout channel with approve/reject buttons
- * 7. Confirm submission to user (ephemeral)
+ * 3. Validate role and squad against config
+ * 4. Validate the ACE Arsenal loadout format
+ * 5. Create player record in database with pending status
+ * 6. Calculate loadout weight
+ * 7. Post review embed to loadout channel with approve/reject buttons
+ * 8. Confirm submission to user (ephemeral)
  * 
  * @param interaction - The Discord interaction from the `/submit` command
- * 
- * @example
- * // User runs: /submit name:"John" role:"Rifleman" squad:"Aglet" loadout:"[...]"
- * // Bot: Validates, saves to DB, posts embed to review channel
- * // User sees: "Loadout submitted!" (ephemeral)
  */
 export async function execute(interaction: ChatInputCommandInteraction) {
   const db = loadDB();
@@ -133,6 +136,32 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   }
 
   // ============================================================================
+  // ROLE AND SQUAD VALIDATION
+  // ============================================================================
+  /**
+   * Validate role and squad against the config.
+   * 
+   * Users can bypass autocomplete and type anything, so we validate
+   * the submitted values before accepting them.
+   */
+  const role = interaction.options.getString('role', true);
+  const squad = interaction.options.getString('squad', true);
+
+  if (!config.roles.includes(role)) {
+    return interaction.reply({
+      content: `❌ Invalid role **${role}**.\nValid roles: ${config.roles.join(', ')}`,
+      ephemeral: true,
+    });
+  }
+
+  if (!config.squads.includes(squad)) {
+    return interaction.reply({
+      content: `❌ Invalid squad **${squad}**.\nValid squads: ${config.squads.join(', ')}`,
+      ephemeral: true,
+    });
+  }
+
+  // ============================================================================
   // LOADOUT VALIDATION
   // ============================================================================
   /**
@@ -154,12 +183,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   const validationResult = validateLoadoutString(loadoutString);
 
   if (!validationResult.valid) {
-    /**
-     * Show up to 5 errors to the user.
-     * 
-     * More detailed validation results can be found in validationResult.all
-     * if the user wants to debug further.
-     */
     const errors: string[] = validationResult.errors
       .slice(0, 5)
       .map(e => `- ${e.message}`);
@@ -182,8 +205,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   const player: Player = {
     discordUID: interaction.user.id,
     name: interaction.options.getString('name', true),
-    role: interaction.options.getString('role', true) as Role,
-    squad: interaction.options.getString('squad', true) as Squad,
+    role,
+    squad,
     loadout: loadoutString,
     status: 'pending',
     submittedAt: Date.now(),
@@ -214,47 +237,21 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   const loadoutChannel = await interaction.client.channels.fetch(loadoutChannelId);
 
   if (loadoutChannel?.isTextBased() && !loadoutChannel.isDMBased()) {
-    /**
-     * Create the review embed.
-     * 
-     * Shows the player's name, squad, role, weight, and a truncated
-     * preview of the loadout code (first 1000 characters).
-     * Orange color indicates pending status.
-     */
     const embed: EmbedBuilder = new EmbedBuilder()
       .setTitle(`${player.name}`)
       .setColor(0xe67e22) // Orange - pending
       .addFields(
-        {
-          name: 'Squad',
-          value: player.squad,
-          inline: true,
-        },
-        {
-          name: 'Role',
-          value: player.role,
-          inline: true,
-        },
-        {
-          name: 'Weight',
-          value: weight !== null ? `${weight} kg` : 'N/A',
-          inline: true,
-        },
-        {
-          name: 'Export Code',
-          value: '```\n' + player.loadout.slice(0, 1000) + '\n```',
-        }
+        { name: 'Squad', value: player.squad, inline: true },
+        { name: 'Role', value: player.role, inline: true },
+        { name: 'Weight', value: weight !== null ? `${weight} kg` : 'N/A', inline: true },
+        { name: 'Export Code', value: '```\n' + player.loadout.slice(0, 1000) + '\n```' }
       )
-      .setFooter({
-        text: `Submitted by ${interaction.user.username} • Pending approval`,
-      })
+      .setFooter({ text: `Submitted by ${interaction.user.username} • Pending approval` })
       .setTimestamp();
 
     /**
      * Create approval button.
-     * 
      * customId format: `approve__${discordId}`
-     * This is parsed in the main bot's interactionCreate handler.
      */
     const approveBtn: ButtonBuilder = new ButtonBuilder()
       .setCustomId(`approve__${interaction.user.id}`)
@@ -264,9 +261,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
     /**
      * Create rejection button.
-     * 
      * customId format: `reject__${discordId}`
-     * This is parsed in the main bot's interactionCreate handler.
      */
     const rejectBtn: ButtonBuilder = new ButtonBuilder()
       .setCustomId(`reject__${interaction.user.id}`)
@@ -274,17 +269,9 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       .setStyle(ButtonStyle.Danger)
       .setEmoji('🚮');
 
-    /**
-     * Combine buttons into an action row.
-     * 
-     * Discord limits button rows to 5 buttons, but we only use 2 here.
-     */
-    const row: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
-      approveBtn,
-      rejectBtn
-    );
+    const row: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>()
+      .addComponents(approveBtn, rejectBtn);
 
-    // Post the embed and buttons to the review channel
     await loadoutChannel.send({
       embeds: [embed],
       components: [row],
@@ -294,11 +281,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   // ============================================================================
   // CONFIRMATION
   // ============================================================================
-  /**
-   * Confirm submission to the user (ephemeral).
-   * 
-   * Only the user who submitted sees this message.
-   */
   return interaction.reply({
     content: `Loadout submitted!`,
     ephemeral: true,

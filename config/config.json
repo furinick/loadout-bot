@@ -1,0 +1,20 @@
+{
+  "roles": [
+    "rifleman",
+    "LAT",
+    "HAT",
+    "TL",
+    "SL",
+    "grenadier",
+    "medic",
+    "engineer",
+    "drone operator",
+    "machinegunner",
+    "autorifleman"
+  ],
+  "squads": [
+    "aglet",
+    "buster",
+    "platoon"
+  ]
+}

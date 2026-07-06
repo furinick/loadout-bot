@@ -1,14 +1,13 @@
-import type { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-
+import type { AutocompleteInteraction, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 /**
  * Arma 3 squad member roles
  */
-export type Role = 'rifleman' | 'LAT' | 'HAT' | 'TL' | 'SL' | 'grenadier' | 'medic' | 'engineer' | 'drone operator' | 'machinegunner' | 'autorifleman';
+export type Role = string
 
 /**
  * Squad identifiers for loadout organization
  */
-export type Squad = 'aglet' | 'buster' | 'platoon';
+export type Squad = string;
 
 /**
  * Submission review status
