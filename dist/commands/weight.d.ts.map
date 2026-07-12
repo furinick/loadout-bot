@@ -1,1 +1,0 @@
-{"version":3,"file":"weight.d.ts","sourceRoot":"","sources":["../../src/commands/weight.ts"],"names":[],"mappings":"AAAA;;;;;;;;;GASG;AAEH,OAAO,EAAuB,2BAA2B,EAAE,MAAM,YAAY,CAAC;AA0B9E;;;;GAIG;AACH,eAAO,MAAM,IAAI,qDAIgF,CAAC;AAElG;;;;;;;;;;;;;;;;;;;;;;;GAuBG;AACH,wBAAsB,OAAO,CAAC,WAAW,EAAE,2BAA2B,GAAG,OAAO,CAAC,IAAI,GAAG,mBAAmB,CAAC,OAAO,CAAC,GAAG,OAAO,CAAC,OAAO,CAAC,CAAC,CAkHvI"}
