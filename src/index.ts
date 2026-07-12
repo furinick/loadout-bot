@@ -169,17 +169,6 @@ client.on('interactionCreate', async (interaction) => {
   // ============================================================================
   // SLASH COMMAND HANDLER
   // ============================================================================
-  if (interaction.isAutocomplete()) {
-    const command = commands.get(interaction.commandName);
-    if (!command?.autocomplete) return;
-    try {
-      await command.autocomplete(interaction);
-    } catch (err) {
-      console.error('Autocomplete error:', err);
-    }
-    return;
-  }
-
   if (!interaction.isChatInputCommand()) return;
 
   /**

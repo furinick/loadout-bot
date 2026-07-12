@@ -70,7 +70,7 @@ export const data = new SlashCommandBuilder()
  * // User runs: /weight (no player specified)
  * // Response: Weight breakdown for the command user
  */
-export async function execute(interaction: ChatInputCommandInteraction): Promise<void | InteractionResponse<boolean> | Message<boolean>> {
+export async function execute(interaction: ChatInputCommandInteraction): Promise<void> {
   // Load the database
   const db = loadDB();
 
