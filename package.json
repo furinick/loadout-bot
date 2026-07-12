@@ -16,7 +16,7 @@
   },
   "homepage": "https://github.com/n1colassilva/loadout-bot#readme",
   "dependencies": {
-    "discord.js": "^14.25.1",
+    "discord.js": "^14.26.5",
     "dotenv": "^17.3.1"
   },
   "devDependencies": {
